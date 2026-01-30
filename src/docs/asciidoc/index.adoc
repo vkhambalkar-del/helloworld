@@ -1,0 +1,156 @@
+= HelloWorld API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+:sectlinks:
+:sectnums:
+:project-version: {project-version}
+
+[[overview]]
+== Overview
+
+This document describes the HelloWorld REST API.
+
+=== Version Information
+[cols="1,1"]
+|===
+|Version |{project-version}
+|API Base Path |`/api`
+|===
+
+=== HTTP Status Codes
+
+The API uses standard HTTP status codes:
+
+[cols="1,3"]
+|===
+|Status Code |Description
+
+|`200 OK`
+|Request completed successfully
+
+|`400 Bad Request`
+|Invalid request parameters
+
+|`404 Not Found`
+|Resource not found
+
+|`500 Internal Server Error`
+|Server error occurred
+|===
+
+[[resources]]
+== Resources
+
+[[resources-hello]]
+=== Hello World
+
+The Hello World resource provides greeting endpoints.
+
+[[resources-hello-default]]
+==== Get Default Greeting
+
+Returns a default "Hello, World!" greeting.
+
+===== HTTP Request
+
+include::{snippets}/hello-default/http-request.adoc[]
+
+===== HTTP Response
+
+include::{snippets}/hello-default/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/hello-default/response-fields.adoc[]
+
+===== Example using cURL
+
+include::{snippets}/hello-default/curl-request.adoc[]
+
+[[resources-hello-custom]]
+==== Get Custom Greeting
+
+Returns a greeting with a custom message.
+
+===== HTTP Request
+
+include::{snippets}/hello-custom/http-request.adoc[]
+
+===== Path Parameters
+
+include::{snippets}/hello-custom/path-parameters.adoc[]
+
+===== HTTP Response
+
+include::{snippets}/hello-custom/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/hello-custom/response-fields.adoc[]
+
+===== Example using cURL
+
+include::{snippets}/hello-custom/curl-request.adoc[]
+
+[[resources-hello-custom-special]]
+==== Custom Greeting with Special Characters
+
+Demonstrates how the API handles special characters in the message.
+
+===== HTTP Request
+
+include::{snippets}/hello-custom-special/http-request.adoc[]
+
+===== Path Parameters
+
+include::{snippets}/hello-custom-special/path-parameters.adoc[]
+
+===== HTTP Response
+
+include::{snippets}/hello-custom-special/http-response.adoc[]
+
+===== Response Fields
+
+include::{snippets}/hello-custom-special/response-fields.adoc[]
+
+[[data-models]]
+== Data Models
+
+[[model-helloworld]]
+=== HelloWorld
+
+The HelloWorld object represents a greeting response.
+
+[cols="1,1,1,3"]
+|===
+|Field |Type |Required |Description
+
+|`message`
+|String
+|Yes
+|The greeting message. Must be between 1 and 100 characters.
+|===
+
+==== Example
+
+[source,json]
+----
+{
+  "message": "Hello, World!"
+}
+----
+
+[[appendix]]
+== Appendix
+
+=== Related Documentation
+
+* Swagger UI: `/swagger-ui.html`
+* OpenAPI Spec: `/v3/api-docs`
+
+=== Contact
+
+For API support, contact the development team.
