@@ -1,13 +1,12 @@
 package org.example.common;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
@@ -15,13 +14,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex, HttpServletRequest request) {
+            MethodArgumentNotValidException ex, WebRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "VALIDATION_ERROR",
                 "Validation failed for the request",
-                request.getRequestURI()
+                request.getDescription(false).replace("uri=", "")
         );
 
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
@@ -35,31 +34,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
-            ConstraintViolationException ex, HttpServletRequest request) {
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "CONSTRAINT_VIOLATION",
-                "Constraint violation",
-                request.getRequestURI()
-        );
-
-        ex.getConstraintViolations().forEach(violation ->
-            errorResponse.addValidationError(
-                    violation.getPropertyPath().toString(),
-                    violation.getInvalidValue(),
-                    violation.getMessage()
-            )
-        );
-
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
-
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatchException(
-            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
@@ -67,7 +44,7 @@ public class GlobalExceptionHandler {
                 String.format("Parameter '%s' must be of type %s",
                         ex.getName(),
                         ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"),
-                request.getRequestURI()
+                request.getDescription(false).replace("uri=", "")
         );
 
         return ResponseEntity.badRequest().body(errorResponse);
@@ -75,13 +52,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex, HttpServletRequest request) {
+            IllegalArgumentException ex, WebRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "INVALID_ARGUMENT",
                 ex.getMessage(),
-                request.getRequestURI()
+                request.getDescription(false).replace("uri=", "")
         );
 
         return ResponseEntity.badRequest().body(errorResponse);
@@ -89,13 +66,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
-            Exception ex, HttpServletRequest request) {
+            Exception ex, WebRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "INTERNAL_ERROR",
                 "An unexpected error occurred",
-                request.getRequestURI()
+                request.getDescription(false).replace("uri=", "")
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
