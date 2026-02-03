@@ -1,6 +1,7 @@
 package org.example.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -10,24 +11,36 @@ public class Employee {
     @Schema(description = "Unique identifier", example = "1042")
     private Long id;
 
+    @NotBlank(message = "First name is required")
+    @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
     @Schema(description = "First name", example = "Sarah")
     private String firstName;
 
+    @NotBlank(message = "Last name is required")
+    @Size(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")
     @Schema(description = "Last name", example = "Mitchell")
     private String lastName;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     @Schema(description = "Email address", example = "s.mitchell@company.org")
     private String email;
 
+    @NotBlank(message = "Department is required")
     @Schema(description = "Department", example = "Finance")
     private String department;
 
+    @NotBlank(message = "Job title is required")
     @Schema(description = "Job title", example = "Senior Analyst")
     private String jobTitle;
 
+    @NotNull(message = "Hire date is required")
+    @PastOrPresent(message = "Hire date cannot be in the future")
     @Schema(description = "Hire date", example = "2019-08-12")
     private LocalDate hireDate;
 
+    @NotNull(message = "Salary is required")
+    @Positive(message = "Salary must be positive")
     @Schema(description = "Salary", example = "82500.00")
     private Double salary;
 

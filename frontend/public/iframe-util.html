@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Parameters Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .param-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .param-item {
+            margin: 5px 0;
+            padding: 8px;
+            background: white;
+            border-left: 3px solid #007bff;
+        }
+        .example-box {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .encoded {
+            color: #d63384;
+            font-family: monospace;
+        }
+        .decoded {
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+<h1>URL Parameters Reader (with Encoding/Decoding)</h1>
+<p>Current URL: <strong id="current-url"></strong></p>
+
+<div class="param-box">
+    <h2>All Parameters (Decoded):</h2>
+    <div id="params-list"></div>
+</div>
+
+<div class="example-box">
+    <h2>Function Usage Examples:</h2>
+    <div id="examples-output"></div>
+</div>
+
+<div class="example-box">
+    <h2>Encoding/Decoding Examples:</h2>
+    <div id="encoding-examples"></div>
+</div>
+
+<div class="param-box">
+    <h2>Try it out:</h2>
+    <p>Add parameters to your URL like:</p>
+    <code>?name=John Doe&email=user@example.com&message=Hello World!&search=a+b+c</code>
+    <p style="margin-top: 10px;">Special characters will be automatically decoded!</p>
+</div>
+
+<script>
+    // ==========================================
+    // URL Encoding/Decoding Utility Functions
+    // ==========================================
+
+    /**
+     * Encode a value for use in URL parameters
+     * @param {string} value - The value to encode
+     * @returns {string} Encoded value
+     */
+    function encodeParam(value) {
+        if (value === null || value === undefined) return '';
+        return encodeURIComponent(String(value));
+    }
+
+    /**
+     * Decode a URL parameter value
+     * @param {string} value - The value to decode
+     * @returns {string} Decoded value
+     */
+    function decodeParam(value) {
+        if (value === null || value === undefined) return '';
+        try {
+            return decodeURIComponent(String(value));
+        } catch (e) {
+            // If decoding fails, return original value
+            console.warn('Failed to decode parameter:', value, e);
+            return value;
+        }
+    }
+
+    /**
+     * Build a URL with encoded parameters
+     * @param {string} baseUrl - Base URL
+     * @param {Object} params - Object with parameters to encode
+     * @returns {string} Complete URL with encoded parameters
+     */
+    function buildURL(baseUrl, params) {
+        const url = new URL(baseUrl, window.location.origin);
+
+        Object.keys(params).forEach(key => {
+            const value = params[key];
+            if (value !== null && value !== undefined) {
+                url.searchParams.append(key, value);
+            }
+        });
+
+        return url.toString();
+    }
+
+    // ==========================================
+    // URL Parameter Utility Functions
+    // ==========================================
+
+    /**
+     * Get all URL parameters as a Map (automatically decoded)
+     * @returns {Map<string, string>} Map of all URL parameters
+     */
+    function getAllParams() {
+        const params = new Map();
+        const urlParams = new URLSearchParams(window.location.search);
+
+        for (const [key, value] of urlParams.entries()) {
+            // URLSearchParams automatically decodes values
+            params.set(decodeParam(key), decodeParam(value));
+        }
+
+        return params;
+    }
+
+    /**
+     * Get a specific parameter value by key (automatically decoded)
+     * @param {string} key - The parameter name
+     * @param {*} defaultValue - Default value if parameter doesn't exist
+     * @returns {string|*} Decoded parameter value or default value
+     */
+    function getParam(key, defaultValue = null) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const value = urlParams.get(key);
+
+        if (value === null) return defaultValue;
+
+        // URLSearchParams already decodes, but we ensure it's decoded
+        return decodeParam(value);
+    }
+
+    /**
+     * Check if a parameter exists in the URL
+     * @param {string} key - The parameter name
+     * @returns {boolean} True if parameter exists
+     */
+    function hasParam(key) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.has(key);
+    }
+
+    /**
+     * Get all values for a parameter (for parameters with multiple values)
+     * All values are automatically decoded
+     * @param {string} key - The parameter name
+     * @returns {Array<string>} Array of all decoded values for the parameter
+     */
+    function getAllParamValues(key) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.getAll(key).map(value => decodeParam(value));
+    }
+
+    /**
+     * Get parameter as integer
+     * @param {string} key - The parameter name
+     * @param {number} defaultValue - Default value if parameter doesn't exist or is invalid
+     * @returns {number} Parameter value as integer
+     */
+    function getParamAsInt(key, defaultValue = 0) {
+        const value = getParam(key);
+        const parsed = parseInt(value, 10);
+        return isNaN(parsed) ? defaultValue : parsed;
+    }
+
+    /**
+     * Get parameter as float
+     * @param {string} key - The parameter name
+     * @param {number} defaultValue - Default value if parameter doesn't exist or is invalid
+     * @returns {number} Parameter value as float
+     */
+    function getParamAsFloat(key, defaultValue = 0.0) {
+        const value = getParam(key);
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? defaultValue : parsed;
+    }
+
+    /**
+     * Get parameter as boolean
+     * @param {string} key - The parameter name
+     * @param {boolean} defaultValue - Default value if parameter doesn't exist
+     * @returns {boolean} Parameter value as boolean
+     */
+    function getParamAsBoolean(key, defaultValue = false) {
+        const value = getParam(key);
+        if (value === null) return defaultValue;
+
+        const lowerValue = value.toLowerCase();
+        return lowerValue === 'true' || lowerValue === '1' || lowerValue === 'yes';
+    }
+
+    /**
+     * Get all parameters as a plain object (automatically decoded)
+     * @returns {Object} Object with all decoded parameters
+     */
+    function getParamsAsObject() {
+        const params = {};
+        const urlParams = new URLSearchParams(window.location.search);
+
+        for (const [key, value] of urlParams.entries()) {
+            params[decodeParam(key)] = decodeParam(value);
+        }
+
+        return params;
+    }
+
+    /**
+     * Get parameter count
+     * @returns {number} Number of parameters in URL
+     */
+    function getParamCount() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return Array.from(urlParams.keys()).length;
+    }
+
+    /**
+     * Get all parameter keys (decoded)
+     * @returns {Array<string>} Array of all decoded parameter keys
+     */
+    function getParamKeys() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return Array.from(urlParams.keys()).map(key => decodeParam(key));
+    }
+
+    /**
+     * Update or add a parameter to the current URL
+     * @param {string} key - Parameter name
+     * @param {string} value - Parameter value (will be encoded)
+     * @param {boolean} reload - Whether to reload the page (default: false)
+     */
+    function setParam(key, value, reload = false) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+
+        if (reload) {
+            window.location.href = url.toString();
+        } else {
+            window.history.pushState({}, '', url.toString());
+        }
+    }
+
+    /**
+     * Remove a parameter from the current URL
+     * @param {string} key - Parameter name to remove
+     * @param {boolean} reload - Whether to reload the page (default: false)
+     */
+    function removeParam(key, reload = false) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete(key);
+
+        if (reload) {
+            window.location.href = url.toString();
+        } else {
+            window.history.pushState({}, '', url.toString());
+        }
+    }
+
+    // ==========================================
+    // Display Functions
+    // ==========================================
+
+    function displayResults() {
+        // Display current URL
+        document.getElementById('current-url').textContent = window.location.href;
+
+        // Display all parameters
+        const params = getAllParams();
+        const paramsList = document.getElementById('params-list');
+
+        if (params.size === 0) {
+            paramsList.innerHTML = '<p>No parameters found in URL</p>';
+        } else {
+            let html = '';
+            params.forEach((value, key) => {
+                html += `<div class="param-item">
+                        <strong>${escapeHtml(key)}:</strong>
+                        <span class="decoded">${escapeHtml(value)}</span>
+                    </div>`;
+            });
+            paramsList.innerHTML = html;
+        }
+
+        // Display function usage examples
+        const examplesOutput = document.getElementById('examples-output');
+        let examples = '<pre>';
+
+        examples += `getParam('name'): "${getParam('name')}"\n`;
+        examples += `getParam('email'): "${getParam('email')}"\n`;
+        examples += `getParam('message'): "${getParam('message')}"\n`;
+        examples += `getParam('search'): "${getParam('search')}"\n`;
+        examples += `getParam('missing', 'Default'): "${getParam('missing', 'Default')}"\n\n`;
+
+        examples += `hasParam('name'): ${hasParam('name')}\n`;
+        examples += `hasParam('missing'): ${hasParam('missing')}\n\n`;
+
+        examples += `getParamCount(): ${getParamCount()}\n`;
+        examples += `getParamKeys(): [${getParamKeys().map(k => `"${k}"`).join(', ')}]\n\n`;
+
+        examples += `getParamsAsObject():\n${JSON.stringify(getParamsAsObject(), null, 2)}\n`;
+
+        examples += '</pre>';
+        examplesOutput.innerHTML = examples;
+
+        // Display encoding/decoding examples
+        const encodingExamples = document.getElementById('encoding-examples');
+        let encodingHtml = '<pre>';
+
+        const testStrings = [
+            'Hello World!',
+            'user@example.com',
+            'a + b = c',
+            'Price: $99.99',
+            'Search: C++ programming',
+            '100% guaranteed'
+        ];
+
+        testStrings.forEach(str => {
+            const encoded = encodeParam(str);
+            const decoded = decodeParam(encoded);
+            encodingHtml += `Original:  "${str}"\n`;
+            encodingHtml += `Encoded:   <span class="encoded">${encoded}</span>\n`;
+            encodingHtml += `Decoded:   <span class="decoded">"${decoded}"</span>\n\n`;
+        });
+
+        // Show example of building a URL
+        encodingHtml += `\n--- Building URLs ---\n`;
+        const exampleUrl = buildURL('https://example.com/search', {
+            query: 'Hello World!',
+            email: 'user@example.com',
+            filter: 'a + b'
+        });
+        encodingHtml += `buildURL('https://example.com/search', {...}):\n${exampleUrl}\n`;
+
+        encodingHtml += '</pre>';
+        encodingExamples.innerHTML = encodingHtml;
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     * @param {string} text - Text to escape
+     * @returns {string} Escaped text
+     */
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Run on page load
+    displayResults();
+
+    // Log to console for easy testing
+    console.log('=== URL Parameter Functions Available ===');
+    console.log('getAllParams():', getAllParams());
+    console.log('getParam("name"):', getParam('name'));
+    console.log('hasParam("email"):', hasParam('email'));
+    console.log('getParamsAsObject():', getParamsAsObject());
+    console.log('\n=== Encoding Functions ===');
+    console.log('encodeParam("Hello World!"):', encodeParam("Hello World!"));
+    console.log('decodeParam("Hello%20World%21"):', decodeParam("Hello%20World%21"));
+    console.log('buildURL():', buildURL('https://example.com', {name: 'John Doe', email: 'test@example.com'}));
+</script>
+</body>
+</html>
+```
+
+**Key Features Added:**
+
+1. **`encodeParam(value)`** - Encodes a value for URL use
+2. **`decodeParam(value)`** - Decodes a URL parameter value
+3. **`buildURL(baseUrl, params)`** - Builds a complete URL with properly encoded parameters
+4. **`setParam(key, value, reload)`** - Add/update a parameter in current URL
+5. **`removeParam(key, reload)`** - Remove a parameter from current URL
+
+**All retrieval functions automatically decode values**, so special characters like spaces, `@`, `+`, `%`, etc. are handled correctly.
+
+**Test it with:**
+```
+?name=John Doe&email=user@example.com&message=Hello World!&search=a+b+c&price=$99.99

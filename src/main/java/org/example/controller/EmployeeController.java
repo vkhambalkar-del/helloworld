@@ -3,6 +3,7 @@ package org.example.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.example.common.ApiResponse;
 import org.example.model.Employee;
 import org.springframework.web.bind.annotation.*;
@@ -81,7 +82,7 @@ public class EmployeeController {
 
     @PostMapping
     @Operation(summary = "Create employee", description = "Creates a new employee")
-    public ApiResponse<Employee> createEmployee(@RequestBody Employee employee) {
+    public ApiResponse<Employee> createEmployee(@Valid @RequestBody Employee employee) {
         employee.setId(idGenerator.getAndIncrement());
         employees.put(employee.getId(), employee);
         return ApiResponse.created(employee, employee.getId().toString(), "/api/employees/" + employee.getId());
@@ -91,7 +92,7 @@ public class EmployeeController {
     @Operation(summary = "Update employee", description = "Updates an existing employee")
     public ApiResponse<Employee> updateEmployee(
             @Parameter(description = "Employee ID") @PathVariable Long id,
-            @RequestBody Employee employee) {
+            @Valid @RequestBody Employee employee) {
         if (!employees.containsKey(id)) {
             return ApiResponse.error("Employee not found with id: " + id);
         }

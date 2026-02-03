@@ -28,13 +28,16 @@ class HelloWorldControllerDocsTest {
     void shouldDocumentGetDefaultGreeting() throws Exception {
         mockMvc.perform(get("/api/hello"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Hello, World!"))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.message").value("Hello, World!"))
                 .andDo(document("hello-default",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
-                                fieldWithPath("message")
-                                        .description("The greeting message. Default value is 'Hello, World!'")
+                                fieldWithPath("success").description("Indicates if the request was successful"),
+                                fieldWithPath("data").description("Response payload data"),
+                                fieldWithPath("data.message").description("The greeting message. Default value is 'Hello, World!'"),
+                                fieldWithPath("timestamp").description("Timestamp of the response")
                         )
                 ));
     }
@@ -43,7 +46,8 @@ class HelloWorldControllerDocsTest {
     void shouldDocumentGetCustomGreeting() throws Exception {
         mockMvc.perform(get("/api/hello/{message}", "Welcome"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Welcome"))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.message").value("Welcome"))
                 .andDo(document("hello-custom",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -52,8 +56,10 @@ class HelloWorldControllerDocsTest {
                                         .description("Custom message to use as the greeting. Must be between 1-100 characters.")
                         ),
                         responseFields(
-                                fieldWithPath("message")
-                                        .description("The custom greeting message provided in the path parameter")
+                                fieldWithPath("success").description("Indicates if the request was successful"),
+                                fieldWithPath("data").description("Response payload data"),
+                                fieldWithPath("data.message").description("The custom greeting message provided in the path parameter"),
+                                fieldWithPath("timestamp").description("Timestamp of the response")
                         )
                 ));
     }
@@ -62,7 +68,8 @@ class HelloWorldControllerDocsTest {
     void shouldDocumentGetCustomGreetingWithSpecialCharacters() throws Exception {
         mockMvc.perform(get("/api/hello/{message}", "Hello from API!"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Hello from API!"))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.message").value("Hello from API!"))
                 .andDo(document("hello-custom-special",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -71,8 +78,10 @@ class HelloWorldControllerDocsTest {
                                         .description("Custom message that can include special characters and spaces")
                         ),
                         responseFields(
-                                fieldWithPath("message")
-                                        .description("The greeting message echoing the input with special characters preserved")
+                                fieldWithPath("success").description("Indicates if the request was successful"),
+                                fieldWithPath("data").description("Response payload data"),
+                                fieldWithPath("data.message").description("The greeting message echoing the input with special characters preserved"),
+                                fieldWithPath("timestamp").description("Timestamp of the response")
                         )
                 ));
     }

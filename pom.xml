@@ -35,13 +35,20 @@
         <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
 
         <!-- Plugin versions -->
-        <jacoco.version>0.8.11</jacoco.version>
+        <jacoco.version>0.8.12</jacoco.version>
         <sonar-maven-plugin.version>3.10.0.2594</sonar-maven-plugin.version>
         <asciidoctor.version>2.2.4</asciidoctor.version>
         <snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
     </properties>
 
     <dependencies>
+        <!-- Common Library -->
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>common-lib</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -90,6 +97,15 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <!-- Only instrument our project classes -->
+                            <includes>
+                                <include>org/example/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>org/example/common/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>report</id>
@@ -97,6 +113,11 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>org/example/common/**</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

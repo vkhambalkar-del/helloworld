@@ -18,13 +18,15 @@ class HelloWorldControllerTest {
     void helloEndpointReturnsDefaultMessage() throws Exception {
         mockMvc.perform(get("/api/hello"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Hello, World!"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.message").value("Hello, World!"));
     }
 
     @Test
     void helloCustomEndpointReturnsCustomMessage() throws Exception {
         mockMvc.perform(get("/api/hello/CustomGreeting"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("CustomGreeting"));
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.message").value("CustomGreeting"));
     }
 }
