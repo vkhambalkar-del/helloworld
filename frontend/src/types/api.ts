@@ -46,3 +46,37 @@ export interface ValidationError {
 export interface HelloWorld {
   message: string;
 }
+
+// Employee model
+export interface Employee {
+  id?: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  department: string;
+  jobTitle: string;
+  hireDate: string; // ISO date string (YYYY-MM-DD)
+  salary: number;
+  active?: boolean;
+}
+
+// Column manifest for backend-driven grid configuration
+export interface ColumnManifest {
+  field: string;
+  headerName: string;
+  type: 'text' | 'number' | 'currency' | 'date' | 'boolean';
+  width?: number;
+  flex?: number;
+  sortable: boolean;
+  filterable: boolean;
+  resizable: boolean;
+  visible: boolean;
+  order: number;
+}
+
+// Worklist model
+export interface Worklist {
+  id?: number;
+  accountName: string;
+  clientName: string;
+}

@@ -1,0 +1,97 @@
+[
+  {
+    "field": "id",
+    "headerName": "ID",
+    "type": "number",
+    "width": 80,
+    "sortable": true,
+    "filterable": false,
+    "resizable": false,
+    "visible": true,
+    "order": 0
+  },
+  {
+    "field": "firstName",
+    "headerName": "First Name TEST",
+    "type": "text",
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 1
+  },
+  {
+    "field": "lastName",
+    "headerName": "AAA Last Name",
+    "type": "text",
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 2
+  },
+  {
+    "field": "email",
+    "headerName": "Email",
+    "type": "text",
+    "flex": 1,
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 3
+  },
+  {
+    "field": "department",
+    "headerName": "Department",
+    "type": "text",
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 4
+  },
+  {
+    "field": "jobTitle",
+    "headerName": "Job Title",
+    "type": "text",
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 5
+  },
+  {
+    "field": "hireDate",
+    "headerName": "Hire Date",
+    "type": "date",
+    "width": 120,
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 6
+  },
+  {
+    "field": "salary",
+    "headerName": "Salary",
+    "type": "currency",
+    "width": 120,
+    "sortable": true,
+    "filterable": true,
+    "resizable": true,
+    "visible": true,
+    "order": 7
+  },
+  {
+    "field": "active",
+    "headerName": "Active",
+    "type": "boolean",
+    "width": 100,
+    "sortable": true,
+    "filterable": true,
+    "resizable": false,
+    "visible": true,
+    "order": 8
+  }
+]
