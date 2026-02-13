@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import { Hello } from '../pages/Hello';
 import { EmployeeList } from '../pages/EmployeeList';
-import { UserList } from '../pages/UserList';
+import { UserListContainer } from '../pages/UserList';
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +18,6 @@ export const router = createBrowserRouter([
   },
   {
     path: '/users',
-    element: <UserList />,
+    element: <UserListContainer />,
   },
 ]);
